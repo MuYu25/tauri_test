@@ -1,57 +1,57 @@
-name: build release
+name: Release
 on:
   push:
     tags:
-      - v*
+      - 'v*'
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  release:
+    permissions:
+      contents: write
     strategy:
+      fail-fast: false
       matrix:
-        platform:
-          - "ubuntu-latest"
-          # - "macos-latest" 
-          # - "windows-latest"
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-      - name: Install dependencies
-        run: npm install
-      # 默认缺少 tauri 依赖
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libgdk-pixbuf2.0-dev
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-          components: rustfmt
+        platform: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
 
-      - name: Install Tauri CLI
-        run: npm install -g @tauri-apps/cli
-      - name: Build Tauri app
-        run: npm run tauri build
-      
-      - name: Create a Release
-        id: create_release
-        uses: actions/create-release@v1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-latest'
+        # You can remove libayatana-appindicator3-dev if you don't use the system tray feature.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Rust setup
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Tauri App ${{ github.ref }}
-          draft: false
-          prerelease: false
+          workspaces: './src-tauri -> target'
+
+      - name: Sync node version and setup cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'lts/*'
+          cache: 'yarn' # Set this to npm, yarn or pnpm.
+
+      - name: Install frontend dependencies
+        # If you don't have `beforeBuildCommand` configured you may want to build your frontend here too.
+        run: yarn install # Change this to npm, yarn or pnpm.
+
+      - name: Build the app
+        uses: tauri-apps/tauri-action@v0
+
         env:
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-      - name: Upload Release Assets
-        uses: actions/upload-release-asset@v1
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./src-tauri/target/release/bundle/  # 你的打包文件路径
-          asset_name: my-app-${{ matrix.platform }}.zip  # 可根据平台设置不同的名称
-          asset_content_type: application/zip
+          tagName: ${{ github.ref_name }} # This only works if your workflow triggers on new tags.
+          releaseName: 'App Name v__VERSION__' # tauri-action replaces \_\_VERSION\_\_ with the app version.
+          releaseBody: 'See the assets to download and install this version.'
+          releaseDraft: true
+          prerelease: false
