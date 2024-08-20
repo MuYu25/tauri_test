@@ -13,9 +13,9 @@ jobs:
       fail-fast: false
       matrix:
         platform: 
-          # - macos-latest
+          - macos-latest
           - ubuntu-latest
-          # - windows-latest
+          - windows-latest
     runs-on: ${{ matrix.platform }}
 
     steps:
@@ -38,7 +38,7 @@ jobs:
           workspaces: './src-tauri -> target'
 
       - name: Sync node version and setup cache
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
           cache: 'npm' # Set this to npm, yarn or pnpm.
