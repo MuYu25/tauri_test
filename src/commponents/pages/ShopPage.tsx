@@ -5,16 +5,16 @@ import { DeleteOutlined, MenuOutlined } from '@ant-design/icons';
 const { Header } = Layout
 const { Footer, Content } = Layout;
 
-// const headerStyle: React.CSSProperties = {
-//     display: 'flex',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//     textAlign: 'center',
-//     color: '#fff',
-//     height: "6%",
-//     backgroundColor: '#4096ff',
-//     padding: 0,
-// };
+const headerStyle: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    color: '#fff',
+    height: "6%",
+    backgroundColor: '#4096ff',
+    padding: 0,
+};
 
 
 const contentStyle: React.CSSProperties = {
