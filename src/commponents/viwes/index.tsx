@@ -3,7 +3,8 @@ import { Flex, Layout } from 'antd';
 import ShopPage from '../pages/ShopPage';
 import ClassPage from '../pages/ClassPage';
 
-const { Header, Footer, Sider, Content } = Layout;
+// const { Header } = Layout
+const { Footer, Sider, Content } = Layout;
 
 // const headerStyle: React.CSSProperties = {
 //     textAlign: 'center',

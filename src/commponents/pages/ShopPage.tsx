@@ -2,7 +2,8 @@ import React from 'react';
 import { Col, Flex, Layout, Row } from 'antd';
 import { DeleteOutlined, MenuOutlined } from '@ant-design/icons';
 
-const { Header, Footer, Content } = Layout;
+const { Header } = Layout
+const { Footer, Content } = Layout;
 
 const headerStyle: React.CSSProperties = {
     display: 'flex',
